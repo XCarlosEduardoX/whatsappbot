@@ -17,23 +17,32 @@ const { detectarSpam } = require('./functions/detectarSpam');
 const { detectarMalasPalabras } = require('./functions/detectarGroserias');
 const { getJuegosGratis } = require('./services/juegosGratisService');
 const client = new Client(clientOptions);
-const { PollVote } = require('whatsapp-web.js');
-
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
 // Generar QR
+
+app.use(express.static(path.join(__dirname)));
+
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'qr.html'));
+});
+
+
 
 client.on('qr', async (qr) => {
     console.log('Generando imagen QR...');
     //genear qr cada 2 minutos
-    setInterval(async () => {
 
-    }, 120000); // 2 minutos
     await generarQR(qr, './qr.png');
-    const qrLink = await qrcode.toDataURL(qr);
 
-    // Guardar el enlace en un archivo HTML (opcional)
-    fs.writeFileSync('./qr.html', `<img src="${qrLink}" />`);
-    console.log('QR generado. Escanea el código QR con tu WhatsApp.');
 
+});
+
+
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor Express activo en http://localhost:${PORT}`);
 });
 
 // Conexión lista
