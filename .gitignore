@@ -3,5 +3,4 @@ node_modules
 qr.png
 qr.html
 package-lock.json
-package.json
 .wwebjs_auth
