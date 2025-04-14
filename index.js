@@ -1,5 +1,5 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode');
+const qrcode = require('qrcode-terminal');
 const cron = require('node-cron');
 const fs = require('fs');
 const path = require('path');
@@ -17,66 +17,19 @@ const { detectarSpam } = require('./functions/detectarSpam');
 const { detectarMalasPalabras } = require('./functions/detectarGroserias');
 const { getJuegosGratis } = require('./services/juegosGratisService');
 const client = new Client(clientOptions);
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
+
 // Generar QR
 
-app.use(express.static(path.join(__dirname)));
-
-
-
-
-client.on('qr', async (qr) => {
-    console.log('Generando imagen QR...');
-    //genear qr cada 2 minutos
-    await generarQR(qr, './qr.png');
-
-    //saber si el qr ya fue generado
-    if (fs.existsSync('./qr.png')) {
-        // res.send(`<img src="${qrLink}" />`);\
-        app.get('/', (req, res) => {
-            res.sendFile(path.join(__dirname, 'qr.png'));
-        });
-        
-    }
-
+client.on('qr', (qr) => {
+    console.clear();
+    console.log('📲 Escanea este código QR con tu WhatsApp:');
+    qrcode.generate(qr, { small: true });
 });
 
-
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor Express activo en http://localhost:${PORT}`);
-});
 
 // Conexión lista
 client.on('ready', async () => {
     console.log('✅ Bot conectado y funcionando.');
-    // // obtener el chatId del grupo
-    // let config = await cargarConfiguraciones();
-
-    // if (config.chatId !== undefined) {
-    //     // Obtener el chat utilizando el chatId almacenado
-    //     const chat = await client.getChatById(config.chatId);
-
-    //     // Asegurarse de que chat.id._serialized esté disponible
-    //     const chatId = chat.id._serialized;
-
-    //     // Verificar si el chatId de la configuración es el mismo que el actual
-    //     if (config.chatId === chatId) return;
-
-    //     // Si no es el mismo chatId, no se puede usar el bot en este chat
-    //     if (config.chatId !== chatId) {
-    //         return;
-    //     }
-    // } else {
-    //     // Si no se encuentra un chatId en la configuración, establecer uno nuevo
-    //     const chat = await client.getChatById(config.chatId);
-    //     const chatId = chat.id._serialized; // Definir chatId
-
-    //     // Asignar y guardar el nuevo chatId en la configuración
-    //     config.chatId = chatId;
-    //     await guardarConfiguraciones(config);
-    // }
 });
 // Cargar comandos dinámicamente
 const comandos = cargarComandos();
