@@ -25,22 +25,21 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname)));
 
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'qr.png'));
-});
-
 
 
 client.on('qr', async (qr) => {
     console.log('Generando imagen QR...');
     //genear qr cada 2 minutos
-   minutos
     await generarQR(qr, './qr.png');
-    const qrLink = await qrcode.toDataURL(qr);
 
-    // Guardar el enlace en un archivo HTML (opcional)
-    fs.writeFileSync('./qr.html', `<img src="${qrLink}" />`);
-    console.log('QR generado. Escanea el código QR con tu WhatsApp.');
+    //saber si el qr ya fue generado
+    if (fs.existsSync('./qr.png')) {
+        // res.send(`<img src="${qrLink}" />`);\
+        app.get('/', (req, res) => {
+            res.sendFile(path.join(__dirname, 'qr.png'));
+        });
+        
+    }
 
 });
 
